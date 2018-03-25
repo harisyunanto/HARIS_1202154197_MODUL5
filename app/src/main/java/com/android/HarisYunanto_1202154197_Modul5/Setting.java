@@ -1,0 +1,139 @@
+package com.android.HarisYunanto_1202154197_Modul5;
+
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.RadioGroup;
+import android.widget.TextView;
+
+public class Setting extends AppCompatActivity {
+
+    //Deklarasikan Variabel
+    TextView shapeclr;
+    int colorid;
+    AlertDialog.Builder alert;
+    SharedPreferences.Editor spe;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(com.android.HarisYunanto_1202154197_Modul5.R.layout.activity_setting);
+        setTitle("Pengaturan");
+
+        //Membuat Alert Dialog Baru Bernama alert
+        alert = new AlertDialog.Builder(this);
+
+        //Inisiasikan Shared Preference
+        SharedPreferences sharedP = getApplicationContext().getSharedPreferences("Preferences", 0);
+        spe = sharedP.edit();
+        colorid = sharedP.getInt("Colourground", com.android.HarisYunanto_1202154197_Modul5.R.color.white);
+        //Inisiasikan Text View pada Layout
+        shapeclr = findViewById(com.android.HarisYunanto_1202154197_Modul5.R.id.shapecolor);
+        //Set Warna dengan Warna yang Dipilih
+        shapeclr.setText(getShapeColor(colorid));
+    }
+
+    //Listener untuk Tombol Back
+    @Override
+    public void onBackPressed() {
+        //Mengirimkan Intent menuju Main Activity
+        startActivity(new Intent(Setting.this, MainActivity.class));
+        //Menutup Activity Setelah Dijalankan
+        finish();
+    }
+
+    //Method yang Dijalankan saat pilihan pada Menu dipilih
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId()==android.R.id.home){
+            //Menjalankan Method onBackPressed
+            this.onBackPressed();
+        }
+        return true;
+    }
+
+    //Mendapatkan String Warna yang akan Digunakan untuk Merubah Warna
+    public String getShapeColor(int i){
+        if (i== R.color.red){
+            return "Red";
+        }else if (i== R.color.green){
+            return "Green";
+        }else if (i== R.color.blue){
+            return "Blue";
+        }else{
+            return "Default";
+        }
+    }
+
+    //Mendapatkan ID dari Warna yang Akan Digunakan
+    public int getColorid(int i){
+        if (i== R.color.red){
+            return R.id.red;
+        }else if (i== R.color.green){
+            return R.id.green;
+        }else if (i== R.color.blue){
+            return R.id.blue;
+        }else {
+            return R.id.white;
+
+        }
+    }
+
+    public void choosecolor(View view) {
+        //set title dari alert dialog
+        alert.setTitle("Shape Color");
+        //membuat view baru
+        View view1 = getLayoutInflater().inflate(R.layout.colorsettings, null);
+        //menampilkan view yang telah dibuat
+        alert.setView(view1);
+
+        //mengakses radio group pada layout
+        final RadioGroup rg = view1.findViewById(R.id.radiocolor);
+        rg.check(getColorid(colorid));
+
+        //ketika menekan Ok pada alert dialog
+        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //mendapatkan id radio button yang di pilih
+                int a = rg.getCheckedRadioButtonId();
+                switch (a){ //switch case inisialisasi id masing-masing warna
+                    //ketika dipilih
+                    case R.id.red:
+                        colorid = R.color.red;
+                        break;
+                    case R.id.green:
+                        colorid = R.color.green;
+                        break;
+                    case R.id.blue:
+                        colorid = R.color.blue;
+                        break;
+                    case R.id.white:
+                        colorid = R.color.white;
+                        break;
+                }
+                //set Warna menjadi color id yang dipilih
+                shapeclr.setText(getShapeColor(colorid));
+                //menaruh shared preference
+                spe.putInt("Colourground", colorid);
+                //commit shared preference
+                spe.commit();
+            }
+        });
+
+        //negative button untuk dialog
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        //membuat dan menampilkan alert dialog
+        alert.create().show();
+    }
+}
